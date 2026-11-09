@@ -79,7 +79,7 @@ p { margin: 0 0 16px; max-width: 38em; }
 .tl-axis { position: relative; height: 40px; font-size: 13px; color: var(--muted); }
 .tl-axis span { position: absolute; top: 6px; transform: translateX(-50%); white-space: nowrap; }
 .tl-axis .first { transform: none; } .tl-axis .last { transform: translateX(-100%); }
-@media (max-width: 520px) { .tl-axis .y25 { display: none; } }
+@media (max-width: 520px) { .tl-axis .y25 { display: none; } .tl-axis .rv { transform: translateX(-85%); } }
 .tl-axis .rv { color: var(--revert); font-weight: 700; top: 22px; }
 @media (prefers-reduced-motion: no-preference) {
   .timeline .tick { animation: rise 500ms ease-out both; }
@@ -104,6 +104,13 @@ p { margin: 0 0 16px; max-width: 38em; }
 .owner.human { border: 1.5px solid var(--ink); }
 @media (max-width: 560px) { .flow li { grid-template-columns: 32px 1fr; } .flow .owner { grid-column: 2; justify-self: start; } .flow .why { grid-column: 2; } }
 
+.owner.both { background: var(--ai-wash); color: var(--ai); box-shadow: inset 0 0 0 1.5px var(--ink); }
+.flow .what code { font-size: 14px; font-weight: 400; color: var(--muted); margin-left: 6px; }
+.gaps { margin: 20px 0 24px; }
+.gaps div { border-left: 3px solid var(--rule); padding: 2px 0 2px 18px; margin-bottom: 18px; max-width: 38em; }
+.gaps div.gap-new { border-left-color: var(--ai); }
+.gaps dt { font-weight: 700; }
+.gaps dd { margin: 2px 0 0; color: var(--muted); font-size: 16px; }
 .revert-box { border-left: 4px solid var(--revert); padding: 4px 0 4px 20px; margin: 24px 0; }
 .revert-box p:last-child { margin-bottom: 0; }
 
@@ -149,17 +156,33 @@ footer p { margin: 0; }
 <p>So the question for the team was not "Which model do we use?" It was "What must the agent know before it starts, and what must it pass before it merges?"</p>
 
 <h2>The workflow</h2>
-<p>Each feature goes through the same 8 steps. The agent does the slow, repeated work. A person owns each decision.</p>
+<p>Each feature goes through the same 6 steps. The first 5 are commands from an open-source skills workflow. My plugins add the business-rule check at the start, and the gates around each step. The agent does the slow, repeated work. A person owns each decision.</p>
 <ol class="flow">
-  <li><span class="what">Product writes the PRD with its business rules</span><span class="owner human">Person</span><span class="why">Good input first. AI output is only as good as the spec that it gets.</span></li>
-  <li><span class="what">The agent checks the PRD against 113 business rules</span><span class="owner agent">Agent</span><span class="why">A conflict goes back to product before anyone writes code, not to QA after.</span></li>
-  <li><span class="what">The agent writes a spec, and an engineer approves it</span><span class="owner human">Person</span><span class="why">The engineer changes the plan while a change is cheap.</span></li>
-  <li><span class="what">The agent splits the spec into tickets</span><span class="owner agent">Agent</span><span class="why">Small tickets give small pull requests that a person can read.</span></li>
-  <li><span class="what">Tests first, then code</span><span class="owner agent">Agent</span><span class="why">A failing test states the rule before the code exists.</span></li>
-  <li><span class="what">AI code review against the team standards</span><span class="owner agent">Agent</span><span class="why">It catches standard problems, so the human review can focus on design.</span></li>
-  <li><span class="what">The agent checks the page in a real browser</span><span class="owner agent">Agent</span><span class="why">A quick check of the real page. It does not replace end-to-end tests.</span></li>
-  <li><span class="what">An engineer reviews and merges</span><span class="owner human">Person</span><span class="why">No pull request merges without a human approval.</span></li>
+  <li><span class="what">Grill the request <code>/grill-with-docs</code></span><span class="owner both">Agent, then person</span><span class="why">Before the first question, the agent loads every domain skill for the repo and checks the PRD against its business rules. Then it asks the engineer questions until the plan has no gaps.</span></li>
+  <li><span class="what">Write the spec <code>/to-spec</code></span><span class="owner human">Person approves</span><span class="why">The spec is a GitHub issue. A new or changed business rule goes in as a decision, with the link to its rule update.</span></li>
+  <li><span class="what">Cut the tickets <code>/to-tickets</code></span><span class="owner agent">Agent</span><span class="why">Thin slices, end to end, into Jira. A slice with more than 15 files or 400 lines of code is split, so that a person can read each pull request.</span></li>
+  <li><span class="what">Build each ticket <code>/implement</code></span><span class="owner agent">Agent</span><span class="why">Test first, 1 ticket at a time. Or all ready tickets in parallel, on 1 integration branch.</span></li>
+  <li><span class="what">Review the code <code>/code-review</code></span><span class="owner agent">Agent</span><span class="why">2 checks: the team coding standards, and the spec. Findings go back to step 4. Then a browser test writes a report with screenshots and API calls.</span></li>
+  <li><span class="what">Review and merge</span><span class="owner human">Person</span><span class="why">No pull request merges without a human approval.</span></li>
 </ol>
+
+<h2>When the grill finds a gap</h2>
+<p>A business rule is something that a product page must always do. Code that breaks a rule is a bug. The rules live in domain skills, 1 plugin for each product, each rule with its reason.</p>
+<p>A hook starts each time an engineer runs the grill. Before the first question, the agent compares the request with the rules and reports 1 of 4 results:</p>
+<dl class="gaps">
+  <div class="gap-new"><dt>No skill covers the area</dt><dd>This is a domain gap. The agent searches for an open <code>domain-gap</code> issue. If there is none, it asks the engineer, then creates the GitHub issue and assigns it to that engineer. The feature work continues: the agent reads the code for that area and says that no rules cover it. Later, the same engineer turns the issue into a new domain skill.</dd></div>
+  <div><dt>A rule changes, or a rule is missing</dt><dd>The agent says so first. The engineer updates the domain skill in a pull request, then the grill continues. The spec quotes the new rule with that link.</dd></div>
+  <div><dt>The A/B test setup is not clear</dt><dd>The agent asks in its first round. It never guesses which users are in which group.</dd></div>
+  <div><dt>No rule is touched</dt><dd>The agent says so, and the grill continues. Most style changes end here.</dd></div>
+</dl>
+<p>This is the command that the hook gives the agent for a gap:</p>
+<pre><code># is there an open gap issue for this area?
+gh issue list --label domain-gap --state open --search "&lt;area&gt;"
+
+# none: create it, and assign it to the engineer who runs the grill
+gh issue create --label domain-gap --assignee @me \
+  --title "&lt;repo&gt;: no skill for &lt;area&gt;" --body "&lt;the request&gt;"</code></pre>
+<p>The result: the rules grow from real feature work, not from a separate project. Each gap has an owner from the first day, and no rule lives only in 1 person's head.</p>
 
 <h2>The tools behind it</h2>
 <p>I designed a Claude Code plugin marketplace for the frontend teams: <strong>7 plugins with 18 skills, in 5 product repos</strong>. A shared plugin holds the team standards. Domain plugins hold the business rules of each product. The plugins extend an open-source skills workflow.</p>
