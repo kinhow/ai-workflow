@@ -293,18 +293,7 @@ gh issue create --label domain-gap --assignee @me \
 <h3>The engineer's job changes</h3>
 <p>Engineers write less code by hand. They own more of the requirements, the gates, and the final approval.</p>
 
-<h2>How I counted</h2>
-<p>The repos are private, so I cannot link to them. Each number on this page comes from git history, and I can show the method in an interview:</p>
-<pre><code># production releases, by date
-git tag -l '&lt;app&gt;/prod/*' --sort=creatordate
-
-# reverts on the main branch
-git log origin/main --oneline -i --grep='^revert'
-
-# first commit with the AI workflow, and its engineers
-git log origin/main -i --grep='Co-Authored-By: Claude' --format='%ad %an'</code></pre>
-
-<h3>What this page does not claim</h3>
+<h2>What this page does not claim</h2>
 <ul class="plain">
   <li>AI did not write all 67 releases. The workflow started with release r34. Releases r1 to r33 came before it.</li>
   <li>The release pace depends on the team and the roadmap too. The workflow is 1 cause, not the only cause.</li>
