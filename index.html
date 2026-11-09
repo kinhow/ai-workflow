@@ -3,8 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI Workflow Case Study</title>
-<meta name="description" content="How a team of 8 frontend engineers at Mudah.my ships code that AI agents write: 34 production releases in under 4 months, with 1 revert.">
+<title>Wong Kin How: AI Workflow Case Study</title>
+<meta name="description" content="Senior Frontend Developer in Kuala Lumpur. I built the AI coding workflow that 8 engineers at Mudah.my use: 34 production releases in under 4 months, with 1 revert.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kinhow.github.io/ai-workflow/">
+<meta property="og:title" content="Wong Kin How: 34 production releases in under 4 months, 1 revert">
+<meta property="og:description" content="Senior Frontend Developer in Kuala Lumpur. I built the AI coding workflow that 8 engineers at Mudah.my use: 34 production releases in under 4 months, with 1 revert.">
+<meta property="og:image" content="https://kinhow.github.io/ai-workflow/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
@@ -45,8 +53,19 @@ body {
 a { color: inherit; text-decoration-color: var(--ai); text-underline-offset: 3px; text-decoration-thickness: 2px; }
 a:focus-visible { outline: 2px solid var(--ai); outline-offset: 3px; border-radius: 2px; }
 
-.byline { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; color: var(--muted); font-size: 15px; margin-bottom: 56px; }
-.byline strong { color: var(--ink); font-weight: 700; }
+.who { display: flex; justify-content: space-between; align-items: center; gap: 16px 24px; flex-wrap: wrap; padding-bottom: 20px; border-bottom: 1px solid var(--rule); margin-bottom: 48px; }
+.who p { margin: 0; }
+.who-name { font-size: 22px; font-weight: 800; letter-spacing: -0.01em; line-height: 1.2; }
+.who-role { font-size: 15px; color: var(--muted); line-height: 1.4; }
+.who-act { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 6px; font-size: 15px; font-weight: 700; text-decoration: none; }
+.btn-solid { background: var(--ink); color: var(--paper); }
+.btn-line { box-shadow: inset 0 0 0 1.5px var(--ink); color: var(--ink); }
+.btn:hover { opacity: .88; }
+.btn:focus-visible { outline: 2px solid var(--ai); outline-offset: 3px; }
+@media (max-width: 560px) { .who-act { width: 100%; } .who-act .btn { flex: 1; justify-content: center; } }
+.stack { margin: 20px 0 0; font-size: 15px; color: var(--muted); max-width: none; }
+.stack b { color: var(--ink); margin-right: 8px; }
 
 h1 {
   font-size: clamp(34px, 6.4vw, 58px);
@@ -147,20 +166,27 @@ code { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.88em
 ul.plain { padding-left: 20px; margin: 0 0 16px; max-width: 38em; }
 ul.plain li { margin-bottom: 8px; }
 
-footer { margin-top: 80px; padding-top: 24px; border-top: 2px solid var(--ink); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
-footer p { margin: 0; }
+.contact { margin-top: 88px; padding-top: 32px; border-top: 2px solid var(--ink); }
+.contact h2 { margin: 0 0 8px; font-size: clamp(24px, 4vw, 32px); line-height: 1.15; max-width: 18em; }
+.contact p { color: var(--muted); margin: 0 0 20px; }
 </style>
 </head>
 <body>
 <main class="wrap">
 
-<div class="byline">
-  <span><strong>Wong Kin How</strong>, Senior Frontend Developer, Kuala Lumpur</span>
-  <span>Case study, November 2026</span>
-</div>
+<header class="who">
+  <div>
+    <p class="who-name">Wong Kin How</p>
+    <p class="who-role">Senior Frontend Developer in Kuala Lumpur. 10 years in frontend, 8 with React.</p>
+  </div>
+  <nav class="who-act" aria-label="Contact">
+    <a class="btn btn-solid" href="mailto:kinhowwong@gmail.com">Email me</a>
+    <a class="btn btn-line" href="resume.pdf">Download resume</a>
+  </nav>
+</header>
 
 <h1>34 production releases in under 4 months. 1&nbsp;revert.</h1>
-<p class="lede">How a team of 8 frontend engineers at Mudah.my ships code that AI agents write, and the gates that I built to keep that code safe in production.</p>
+<p class="lede">I built the AI coding workflow that 8 frontend engineers at Mudah.my use every day, and the checks that keep its code safe in production.</p>
 
 <figure class="timeline" aria-labelledby="tl-cap">
   <div class="tl-heads">
@@ -177,6 +203,7 @@ footer p { margin: 0; }
   <div><dt>1</dt><dd>revert in all 67, and it was not AI-written code</dd></div>
   <div><dt>8</dt><dd>engineers who commit with the AI workflow</dd></div>
 </dl>
+<p class="stack"><b>Stack</b> Next.js 16, React 19, TypeScript, TanStack Query, Zustand, Claude Code plugins and skills, MCP, CI eval gates</p>
 
 <h2>The problem</h2>
 <p>AI coding agents write code fast. They do not know the business rules of a marketplace: which listing fields a dealer must fill, which prices the page can show, which SEO rules apply. A fast agent with no rules gives fast code that breaks a rule in a quiet way. A reviewer then finds the problem late, or a user finds it in production.</p>
@@ -300,9 +327,13 @@ gh issue create --label domain-gap --assignee @me \
   <li>The eval suite compares results with and without each plugin. I did not keep the raw runs of the first evals, so this page does not give a score.</li>
 </ul>
 
-<footer>
-  <p><strong>Wong Kin How</strong><br>Senior Frontend Developer, Kuala Lumpur</p>
-  <p><a href="mailto:kinhowwong@gmail.com">kinhowwong@gmail.com</a><br><a href="resume.pdf">Download my resume (PDF)</a></p>
+<footer class="contact">
+  <h2>Talk to me about a frontend lead or AI workflow role</h2>
+  <p>I can show this workflow live in an interview, on a demo repo.</p>
+  <div class="who-act">
+    <a class="btn btn-solid" href="mailto:kinhowwong@gmail.com">Email kinhowwong@gmail.com</a>
+    <a class="btn btn-line" href="resume.pdf">Download resume</a>
+  </div>
 </footer>
 
 </main>
