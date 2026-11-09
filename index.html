@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Workflow Case Study</title>
+<meta name="description" content="How a team of 8 frontend engineers at Mudah.my ships code that AI agents write: 34 production releases in under 4 months, with 1 revert.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #F4F6F8;
+  --ink: #18212B;
+  --muted: #56626F;
+  --rule: #D3DAE1;
+  --pre: #8D9BAA;
+  --ai: #1E7A55;
+  --ai-wash: #E2EFE8;
+  --revert: #B14F26;
+  --code-bg: #E9EDF1;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #12171D; --ink: #E6EAEE; --muted: #9AA6B2; --rule: #2A333D;
+    --pre: #5F6E7D; --ai: #3DBE88; --ai-wash: #17271F; --revert: #E07A4F; --code-bg: #1B222A;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #12171D; --ink: #E6EAEE; --muted: #9AA6B2; --rule: #2A333D;
+  --pre: #5F6E7D; --ai: #3DBE88; --ai-wash: #17271F; --revert: #E07A4F; --code-bg: #1B222A;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Schibsted Grotesk", system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+}
+.wrap { max-width: 760px; margin: 0 auto; padding: 40px 16px 80px; }
+a { color: inherit; text-decoration-color: var(--ai); text-underline-offset: 3px; text-decoration-thickness: 2px; }
+a:focus-visible { outline: 2px solid var(--ai); outline-offset: 3px; border-radius: 2px; }
+
+.byline { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; color: var(--muted); font-size: 15px; margin-bottom: 56px; }
+.byline strong { color: var(--ink); font-weight: 700; }
+
+h1 {
+  font-size: clamp(34px, 6.4vw, 58px);
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  font-weight: 800;
+  margin: 0 0 20px;
+  max-width: 15ch;
+}
+.lede { font-size: 20px; line-height: 1.5; color: var(--muted); margin: 0 0 40px; max-width: 34em; }
+
+h2 { font-size: 26px; line-height: 1.2; letter-spacing: -0.01em; font-weight: 800; margin: 72px 0 16px; }
+h3 { font-size: 18px; font-weight: 700; margin: 28px 0 6px; }
+p { margin: 0 0 16px; max-width: 38em; }
+
+/* Release timeline: the one visual that carries the page */
+.timeline { margin: 0 0 12px; }
+.tl-heads { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 10px; font-size: 15px; line-height: 1.3; }
+.tl-heads b { display: block; font-size: 17px; }
+.tl-heads span { color: var(--muted); }
+.tl-heads .right { text-align: right; }
+.tl-heads .right b { color: var(--ai); }
+.timeline svg { display: block; width: 100%; height: 88px; }
+.timeline .axis { stroke: var(--rule); stroke-width: 1; }
+.timeline .era { fill: var(--ai-wash); }
+.timeline .tick { stroke-width: 3; stroke-linecap: butt; }
+.timeline .tick-pre { stroke: var(--pre); }
+.timeline .tick-ai { stroke: var(--ai); }
+.timeline .tick-revert { stroke: var(--revert); }
+.tl-axis { position: relative; height: 40px; font-size: 13px; color: var(--muted); }
+.tl-axis span { position: absolute; top: 6px; transform: translateX(-50%); white-space: nowrap; }
+.tl-axis .first { transform: none; } .tl-axis .last { transform: translateX(-100%); }
+@media (max-width: 520px) { .tl-axis .y25 { display: none; } }
+.tl-axis .rv { color: var(--revert); font-weight: 700; top: 22px; }
+@media (prefers-reduced-motion: no-preference) {
+  .timeline .tick { animation: rise 500ms ease-out both; }
+  @keyframes rise { from { opacity: 0; } to { opacity: 1; } }
+}
+.caption { font-size: 14px; color: var(--muted); margin: 0 0 40px; }
+
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 2px solid var(--ink); margin: 0; }
+.facts div { padding: 14px 16px 4px 0; }
+.facts dt { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+.facts dd { margin: 4px 0 0; color: var(--muted); font-size: 15px; line-height: 1.4; }
+@media (max-width: 560px) { .facts { grid-template-columns: 1fr; } .facts div { border-bottom: 1px solid var(--rule); padding-bottom: 14px; } }
+
+/* Workflow: a real sequence, so it gets numbers */
+.flow { list-style: none; padding: 0; margin: 24px 0 0; counter-reset: step; }
+.flow li { counter-increment: step; display: grid; grid-template-columns: 44px 1fr auto; gap: 4px 12px; padding: 14px 0; border-top: 1px solid var(--rule); align-items: baseline; }
+.flow li::before { content: counter(step); font-weight: 800; font-size: 20px; color: var(--muted); }
+.flow .what { font-weight: 700; }
+.flow .why { grid-column: 2 / 4; color: var(--muted); font-size: 15px; line-height: 1.5; }
+.owner { font-size: 13px; font-weight: 700; padding: 2px 10px; border-radius: 999px; white-space: nowrap; }
+.owner.agent { background: var(--ai-wash); color: var(--ai); }
+.owner.human { border: 1.5px solid var(--ink); }
+@media (max-width: 560px) { .flow li { grid-template-columns: 32px 1fr; } .flow .owner { grid-column: 2; justify-self: start; } .flow .why { grid-column: 2; } }
+
+.revert-box { border-left: 4px solid var(--revert); padding: 4px 0 4px 20px; margin: 24px 0; }
+.revert-box p:last-child { margin-bottom: 0; }
+
+pre { background: var(--code-bg); padding: 16px; border-radius: 6px; overflow-x: auto; font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 13.5px; line-height: 1.55; margin: 12px 0 20px; }
+code { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.88em; }
+
+ul.plain { padding-left: 20px; margin: 0 0 16px; max-width: 38em; }
+ul.plain li { margin-bottom: 8px; }
+
+footer { margin-top: 80px; padding-top: 24px; border-top: 2px solid var(--ink); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+footer p { margin: 0; }
+</style>
+</head>
+<body>
+<main class="wrap">
+
+<div class="byline">
+  <span><strong>Wong Kin How</strong>, Senior Frontend Developer, Kuala Lumpur</span>
+  <span>Case study, November 2026</span>
+</div>
+
+<h1>34 production releases in under 4 months. 1&nbsp;revert.</h1>
+<p class="lede">How a team of 8 frontend engineers at Mudah.my ships code that AI agents write, and the gates that I built to keep that code safe in production.</p>
+
+<figure class="timeline" aria-labelledby="tl-cap">
+  <div class="tl-heads">
+    <div><b>33 releases in 21 months</b><span>before the AI workflow</span></div>
+    <div class="right"><b>34 in under 4 months</b><span>with the AI workflow</span></div>
+  </div>
+  <svg id="tl" viewBox="0 0 1000 88" preserveAspectRatio="none" role="img" aria-label="Timeline of 67 production releases from September 2024 to November 2026. 33 releases came in 21 months before the AI workflow. 34 releases came in under 4 months after it started in July 2026. Release r54 was the only one that the team reverted."></svg>
+  <div class="tl-axis" id="tl-axis"></div>
+</figure>
+<p class="caption" id="tl-cap">Each line is 1 production release of the Auto web app, placed on its date. The green area starts on 14 July 2026, the first release with the AI workflow.</p>
+
+<dl class="facts">
+  <div><dt>67</dt><dd>production releases since September 2024</dd></div>
+  <div><dt>1</dt><dd>revert in all 67, and it was not AI-written code</dd></div>
+  <div><dt>8</dt><dd>engineers who commit with the AI workflow</dd></div>
+</dl>
+
+<h2>The problem</h2>
+<p>AI coding agents write code fast. They do not know the business rules of a marketplace: which listing fields a dealer must fill, which prices the page can show, which SEO rules apply. A fast agent with no rules gives fast code that breaks a rule in a quiet way. A reviewer then finds the problem late, or a user finds it in production.</p>
+<p>So the question for the team was not "Which model do we use?" It was "What must the agent know before it starts, and what must it pass before it merges?"</p>
+
+<h2>The workflow</h2>
+<p>Each feature goes through the same 8 steps. The agent does the slow, repeated work. A person owns each decision.</p>
+<ol class="flow">
+  <li><span class="what">Product writes the PRD with its business rules</span><span class="owner human">Person</span><span class="why">Good input first. AI output is only as good as the spec that it gets.</span></li>
+  <li><span class="what">The agent checks the PRD against 113 business rules</span><span class="owner agent">Agent</span><span class="why">A conflict goes back to product before anyone writes code, not to QA after.</span></li>
+  <li><span class="what">The agent writes a spec, and an engineer approves it</span><span class="owner human">Person</span><span class="why">The engineer changes the plan while a change is cheap.</span></li>
+  <li><span class="what">The agent splits the spec into tickets</span><span class="owner agent">Agent</span><span class="why">Small tickets give small pull requests that a person can read.</span></li>
+  <li><span class="what">Tests first, then code</span><span class="owner agent">Agent</span><span class="why">A failing test states the rule before the code exists.</span></li>
+  <li><span class="what">AI code review against the team standards</span><span class="owner agent">Agent</span><span class="why">It catches standard problems, so the human review can focus on design.</span></li>
+  <li><span class="what">The agent checks the page in a real browser</span><span class="owner agent">Agent</span><span class="why">A quick check of the real page. It does not replace end-to-end tests.</span></li>
+  <li><span class="what">An engineer reviews and merges</span><span class="owner human">Person</span><span class="why">No pull request merges without a human approval.</span></li>
+</ol>
+
+<h2>The tools behind it</h2>
+<p>I designed a Claude Code plugin marketplace for the frontend teams: <strong>7 plugins with 18 skills, in 5 product repos</strong>. A shared plugin holds the team standards. Domain plugins hold the business rules of each product. The plugins extend an open-source skills workflow.</p>
+<h3>A plugin ships only if it makes the output better</h3>
+<p>Each plugin release goes through 3 gates:</p>
+<ul class="plain">
+  <li>A CI check on each pull request.</li>
+  <li>A version and a change log through Changesets, so each team knows what changed.</li>
+  <li>An eval suite that runs the same tasks with and without the plugin. If the result with the plugin is not better, the plugin does not ship.</li>
+</ul>
+
+<h2>The 1 revert</h2>
+<div class="revert-box">
+  <p><strong>Release r54, 7 October 2026.</strong> I upgraded all packages in 1 pull request to close 96 Dependabot alerts. I wrote that change by hand, outside the AI workflow. We undid it the next day, in release r55.</p>
+  <p>The lesson: a large change that skips the small steps is a risk, if a person or an agent writes it.</p>
+</div>
+
+<h2>What I learned</h2>
+<h3>A better model does not fix a bad spec</h3>
+<p>Most bad AI output came from a vague input. The largest gain came from the business-rule check before the spec, not from a newer model.</p>
+<h3>Measure the result, not the volume</h3>
+<p>The number of lines that AI writes says nothing about quality. The revert rate and the release pace do. These are the numbers that I track.</p>
+<h3>The engineer's job changes</h3>
+<p>Engineers write less code by hand. They own more of the requirements, the gates, and the final approval.</p>
+
+<h2>How I counted</h2>
+<p>The repos are private, so I cannot link to them. Each number on this page comes from git history, and I can show the method in an interview:</p>
+<pre><code># production releases, by date
+git tag -l '&lt;app&gt;/prod/*' --sort=creatordate
+
+# reverts on the main branch
+git log origin/main --oneline -i --grep='^revert'
+
+# first commit with the AI workflow, and its engineers
+git log origin/main -i --grep='Co-Authored-By: Claude' --format='%ad %an'</code></pre>
+
+<h3>What this page does not claim</h3>
+<ul class="plain">
+  <li>AI did not write all 67 releases. The workflow started with release r34. Releases r1 to r33 came before it.</li>
+  <li>The release pace depends on the team and the roadmap too. The workflow is 1 cause, not the only cause.</li>
+  <li>The eval suite compares results with and without each plugin. I did not keep the raw runs of the first evals, so this page does not give a score.</li>
+</ul>
+
+<footer>
+  <p><strong>Wong Kin How</strong><br>Senior Frontend Developer, Kuala Lumpur</p>
+  <p><a href="mailto:kinhowwong@gmail.com">kinhowwong@gmail.com</a><br><a href="resume.pdf">Download my resume (PDF)</a></p>
+</footer>
+
+</main>
+
+<script>
+(function () {
+  // Production release dates (git tags prod/r1 to prod/r67).
+  var dates = "2024-09-25 2024-09-27 2025-01-20 2025-03-14 2025-04-17 2025-04-17 2025-04-28 2025-04-30 2025-06-16 2025-06-19 2025-06-19 2025-06-20 2025-07-16 2025-07-28 2025-10-13 2025-12-10 2025-12-16 2026-02-05 2026-02-11 2026-03-03 2026-03-11 2026-03-13 2026-03-18 2026-04-02 2026-04-07 2026-04-07 2026-04-22 2026-05-06 2026-05-18 2026-06-18 2026-06-25 2026-06-26 2026-07-02 2026-07-14 2026-07-20 2026-07-21 2026-07-23 2026-07-23 2026-07-28 2026-07-30 2026-08-06 2026-08-06 2026-08-13 2026-08-13 2026-08-26 2026-08-26 2026-08-27 2026-09-01 2026-09-07 2026-09-14 2026-09-22 2026-10-05 2026-10-05 2026-10-07 2026-10-08 2026-10-12 2026-10-19 2026-10-21 2026-10-22 2026-10-25 2026-10-27 2026-10-28 2026-10-30 2026-11-02 2026-11-04 2026-11-04 2026-11-05".split(" ");
+  var AI_START = 34, REVERTED = 54;
+  var NS = "http://www.w3.org/2000/svg";
+  var svg = document.getElementById("tl"), axis = document.getElementById("tl-axis");
+  var t0 = Date.parse("2024-09-01"), t1 = Date.parse("2026-11-30");
+  function pct(d) { return (Date.parse(d) - t0) / (t1 - t0); }
+  function el(name, attrs) {
+    var n = document.createElementNS(NS, name);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    svg.appendChild(n); return n;
+  }
+  var eraX = pct("2026-07-10") * 1000;
+  el("rect", { "class": "era", x: eraX, y: 0, width: 1000 - eraX, height: 88 });
+  el("line", { "class": "axis", x1: 0, y1: 87.5, x2: 1000, y2: 87.5, "vector-effect": "non-scaling-stroke" });
+  var seen = {};
+  dates.forEach(function (d, i) {
+    var n = i + 1, off = (seen[d] = (seen[d] || 0) + 1) - 1;
+    var cls = n === REVERTED ? "tick tick-revert" : n >= AI_START ? "tick tick-ai" : "tick tick-pre";
+    var xx = pct(d) * 1000 + off * 4;
+    var line = el("line", { "class": cls, x1: xx, x2: xx, y1: 88, y2: n === REVERTED ? 4 : 22, "vector-effect": "non-scaling-stroke" });
+    line.style.animationDelay = (i * 10) + "ms";
+    var tip = document.createElementNS(NS, "title");
+    tip.textContent = "Release r" + n + ", " + d + (n === REVERTED ? " (reverted in r55)" : "");
+    line.appendChild(tip);
+  });
+  function label(text, p, cls) {
+    var s = document.createElement("span");
+    s.textContent = text; s.style.left = (p * 100) + "%";
+    if (cls) s.className = cls; axis.appendChild(s);
+  }
+  label("Sep 2024", 0, "first");
+  label("2025", pct("2025-01-01"), "y25");
+  label("2026", pct("2026-01-01"));
+  label("Nov 2026", 1, "last");
+  label("r54 reverted", pct(dates[REVERTED - 1]), "rv");
+})();
+</script>
+</body>
+</html>
