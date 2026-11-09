@@ -156,14 +156,16 @@ footer p { margin: 0; }
 <p>So the question for the team was not "Which model do we use?" It was "What must the agent know before it starts, and what must it pass before it merges?"</p>
 
 <h2>The workflow</h2>
-<p>Each feature goes through the same 6 steps. The first 5 are commands from an open-source skills workflow. My plugins add the business-rule check at the start, and the gates around each step. The agent does the slow, repeated work. A person owns each decision.</p>
+<p>Each feature goes through the same 8 steps. Steps 1 to 6 are commands from an open-source skills workflow. My plugins add the business-rule check at the start, and the staging merge for QA at the end. The agent does the slow, repeated work. A person owns each decision.</p>
 <ol class="flow">
   <li><span class="what">Grill the request <code>/grill-with-docs</code></span><span class="owner both">Agent, then person</span><span class="why">Before the first question, the agent loads every domain skill for the repo and checks the PRD against its business rules. Then it asks the engineer questions until the plan has no gaps.</span></li>
-  <li><span class="what">Write the spec <code>/to-spec</code></span><span class="owner human">Person approves</span><span class="why">The spec is a GitHub issue. A new or changed business rule goes in as a decision, with the link to its rule update.</span></li>
+  <li><span class="what">Write the spec <code>/to-spec</code></span><span class="owner agent">Agent</span><span class="why">The agent writes the spec as a GitHub issue, from the answers in the grill. A new or changed business rule goes in as a decision, with the link to its rule update.</span></li>
   <li><span class="what">Cut the tickets <code>/to-tickets</code></span><span class="owner agent">Agent</span><span class="why">Thin slices, end to end, into Jira. A slice with more than 15 files or 400 lines of code is split, so that a person can read each pull request.</span></li>
   <li><span class="what">Build each ticket <code>/implement</code></span><span class="owner agent">Agent</span><span class="why">Test first, 1 ticket at a time. Or all ready tickets in parallel, on 1 integration branch.</span></li>
   <li><span class="what">Review the code <code>/code-review</code></span><span class="owner agent">Agent</span><span class="why">2 checks: the team coding standards, and the spec. Findings go back to step 4. Then a browser test writes a report with screenshots and API calls.</span></li>
-  <li><span class="what">Review and merge</span><span class="owner human">Person</span><span class="why">No pull request merges without a human approval.</span></li>
+  <li><span class="what">Write the pull request <code>/pr</code></span><span class="owner agent">Agent</span><span class="why">The PR body shows the smallest visual of the change, before-and-after proof that it works, and how easy it is to undo.</span></li>
+  <li><span class="what">Merge to staging for QA <code>/merge-to-staging</code></span><span class="owner agent">Agent</span><span class="why">The agent checks that the branch is clean and pushed, merges it into a staging branch, and CI puts it on the staging site. It stops for a person if a conflict is not safe to fix.</span></li>
+  <li><span class="what">Review and merge to main</span><span class="owner human">Person</span><span class="why">After QA passes, an engineer reviews the pull request. No pull request merges without a human approval.</span></li>
 </ol>
 
 <h2>When the grill finds a gap</h2>
