@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Wong Kin How: AI Workflow Case Study</title>
-<meta name="description" content="Senior Frontend Developer in Kuala Lumpur. I built the AI coding workflow that 8 engineers at Mudah.my use: 34 production releases in under 4 months, with 1 revert.">
+<meta name="description" content="Senior Frontend Developer in Kuala Lumpur. I make AI coding agents safe for a product team: context engineering, Claude Code hooks, subagents, plugins, and a spec-driven workflow.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://kinhow.github.io/ai-workflow/">
-<meta property="og:title" content="Wong Kin How: 34 production releases in under 4 months, 1 revert">
-<meta property="og:description" content="Senior Frontend Developer in Kuala Lumpur. I built the AI coding workflow that 8 engineers at Mudah.my use: 34 production releases in under 4 months, with 1 revert.">
+<meta property="og:title" content="Wong Kin How: I make AI coding agents safe for a product team">
+<meta property="og:description" content="Senior Frontend Developer in Kuala Lumpur. Context engineering, Claude Code hooks, subagents, plugins, and a spec-driven workflow, in the order that I built them.">
 <meta property="og:image" content="https://kinhow.github.io/ai-workflow/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -73,7 +73,7 @@ h1 {
   letter-spacing: -0.025em;
   font-weight: 800;
   margin: 0 0 20px;
-  max-width: 15ch;
+  max-width: 17ch;
 }
 .lede { font-size: 20px; line-height: 1.5; color: var(--muted); margin: 0 0 40px; max-width: 34em; }
 
@@ -81,36 +81,30 @@ h2 { font-size: 26px; line-height: 1.2; letter-spacing: -0.01em; font-weight: 80
 h3 { font-size: 18px; font-weight: 700; margin: 28px 0 6px; }
 p { margin: 0 0 16px; max-width: 38em; }
 
-/* Release timeline: the one visual that carries the page */
-.timeline { margin: 0 0 12px; }
-.tl-heads { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 10px; font-size: 15px; line-height: 1.3; }
-.tl-heads b { display: block; font-size: 17px; }
-.tl-heads span { color: var(--muted); }
-.tl-heads .right { text-align: right; }
-.tl-heads .right b { color: var(--ai); }
-.timeline svg { display: block; width: 100%; height: 88px; }
-.timeline .axis { stroke: var(--rule); stroke-width: 1; }
-.timeline .era { fill: var(--ai-wash); }
-.timeline .tick { stroke-width: 3; stroke-linecap: butt; }
-.timeline .tick-pre { stroke: var(--pre); }
-.timeline .tick-ai { stroke: var(--ai); }
-.timeline .tick-revert { stroke: var(--revert); }
-.tl-axis { position: relative; height: 40px; font-size: 13px; color: var(--muted); }
-.tl-axis span { position: absolute; top: 6px; transform: translateX(-50%); white-space: nowrap; }
-.tl-axis .first { transform: none; } .tl-axis .last { transform: translateX(-100%); }
-@media (max-width: 520px) { .tl-axis .y25 { display: none; } .tl-axis .rv { transform: translateX(-85%); } }
-.tl-axis .rv { color: var(--revert); font-weight: 700; top: 22px; }
+/* Stage timeline: the one visual that carries the page */
+.stages { list-style: none; padding: 0; margin: 0 0 12px 72px; border-left: 2px solid var(--rule); }
+.stages li { position: relative; padding: 0 0 20px 22px; }
+.stages li:last-child { padding-bottom: 4px; }
+.stages li::before { content: ""; position: absolute; left: -8px; top: 6px; width: 14px; height: 14px; border-radius: 50%; background: var(--paper); box-shadow: inset 0 0 0 3px var(--ai); }
+.stages li:last-child::before { background: var(--ai); }
+.stages time { position: absolute; left: -72px; top: 0; width: 56px; text-align: right; font-weight: 700; font-size: 15px; color: var(--muted); }
+.stages b { display: block; font-size: 18px; line-height: 1.35; }
+.stages span { display: block; color: var(--muted); font-size: 15px; line-height: 1.45; max-width: 36em; }
 @media (prefers-reduced-motion: no-preference) {
-  .timeline .tick { animation: rise 500ms ease-out both; }
+  .stages li { animation: rise 420ms ease-out both; }
+  .stages li:nth-child(2) { animation-delay: 80ms; } .stages li:nth-child(3) { animation-delay: 160ms; }
+  .stages li:nth-child(4) { animation-delay: 240ms; } .stages li:nth-child(5) { animation-delay: 320ms; }
+  .stages li:nth-child(6) { animation-delay: 400ms; }
   @keyframes rise { from { opacity: 0; } to { opacity: 1; } }
 }
-.caption { font-size: 14px; color: var(--muted); margin: 0 0 40px; }
+.caption { font-size: 14px; color: var(--muted); margin: 16px 0 0; }
 
-.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 2px solid var(--ink); margin: 0; }
-.facts div { padding: 14px 16px 4px 0; }
-.facts dt { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
-.facts dd { margin: 4px 0 0; color: var(--muted); font-size: 15px; line-height: 1.4; }
-@media (max-width: 560px) { .facts { grid-template-columns: 1fr; } .facts div { border-bottom: 1px solid var(--rule); padding-bottom: 14px; } }
+.hooks { margin: 20px 0 24px; }
+.hooks div { display: grid; grid-template-columns: 180px 1fr; gap: 4px 16px; padding: 10px 0; border-top: 1px solid var(--rule); max-width: 38em; }
+.hooks dt { font-weight: 700; font-size: 15px; }
+.hooks dt code { display: block; font-weight: 400; color: var(--muted); font-size: 13px; }
+.hooks dd { margin: 0; color: var(--muted); font-size: 16px; }
+@media (max-width: 560px) { .hooks div { grid-template-columns: 1fr; } }
 
 /* Workflow: a real sequence, so it gets numbers */
 .flow { list-style: none; padding: 0; margin: 24px 0 0; counter-reset: step; }
@@ -157,8 +151,6 @@ p { margin: 0 0 16px; max-width: 38em; }
 .dg .t-cap { font-size: 12px; font-weight: 700; fill: var(--muted); }
 .dg .t-arrow { font-size: 8px; font-family: "JetBrains Mono", ui-monospace, monospace; letter-spacing: .06em; fill: var(--muted); }
 .dg .t-leg { font-size: 11px; fill: var(--muted); text-anchor: start; }
-.revert-box { border-left: 4px solid var(--revert); padding: 4px 0 4px 20px; margin: 24px 0; }
-.revert-box p:last-child { margin-bottom: 0; }
 
 pre { background: var(--code-bg); padding: 16px; border-radius: 6px; overflow-x: auto; font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 13.5px; line-height: 1.55; margin: 12px 0 20px; }
 code { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.88em; }
@@ -185,29 +177,46 @@ ul.plain li { margin-bottom: 8px; }
   </nav>
 </header>
 
-<h1>34 production releases in under 4 months. 1&nbsp;revert.</h1>
-<p class="lede">I built the AI coding workflow that 8 frontend engineers at Mudah.my use every day, and the checks that keep its code safe in production.</p>
+<h1>I make AI coding agents safe for a product&nbsp;team.</h1>
+<p class="lede">Not with better prompts. With context engineering, Claude Code hooks, subagents, plugins, and a spec-driven workflow. This is what I built at Mudah.my in 2026, in the order that I built it.</p>
 
-<figure class="timeline" aria-labelledby="tl-cap">
-  <div class="tl-heads">
-    <div><b>33 releases in 21 months</b><span>before the AI workflow</span></div>
-    <div class="right"><b>34 in under 4 months</b><span>with the AI workflow</span></div>
-  </div>
-  <svg id="tl" viewBox="0 0 1000 88" preserveAspectRatio="none" role="img" aria-label="Timeline of 67 production releases from September 2024 to November 2026. 33 releases came in 21 months before the AI workflow. 34 releases came in under 4 months after it started in July 2026. Release r54 was the only one that the team reverted."></svg>
-  <div class="tl-axis" id="tl-axis"></div>
+<figure aria-labelledby="st-cap" style="margin:0">
+<ol class="stages">
+  <li><time datetime="2026-03">Mar</time><b>Context files</b><span>The first agent commits. Instruction files with path-scoped rules, so the agent reads only the rules for the files that it changes.</span></li>
+  <li><time datetime="2026-04">Apr</time><b>Guardrails</b><span>CLAUDE.md, 2 subagents (an engineer and a reviewer), and hooks that block unsafe actions and stop a PR until the tests pass.</span></li>
+  <li><time datetime="2026-05">May</time><b>Team plugins</b><span>A Claude Code plugin marketplace, so the whole team installs the same skills and hooks.</span></li>
+  <li><time datetime="2026-08">Aug</time><b>Shared words</b><span>ADRs and a glossary, so the agent uses the same domain words as the product team.</span></li>
+  <li><time datetime="2026-09">Sep</time><b>Spec-driven workflow</b><span>Business rules for each product, a rule check before each spec, the 8-step workflow, and an eval gate on each plugin release.</span></li>
+  <li><time datetime="2026-10">Oct</time><b>Context budget</b><span>Shorter skill text that fits the agent's skill list, and a staging merge that fixes safe conflicts by itself.</span></li>
+</ol>
+<figcaption class="caption" id="st-cap">Each step has a commit in the work repos. The repos are private, so this page shows the method.</figcaption>
 </figure>
-<p class="caption" id="tl-cap">Each line is 1 production release of the Auto web app, placed on its date. The green area starts on 14 July 2026, the first release with the AI workflow.</p>
-
-<dl class="facts">
-  <div><dt>67</dt><dd>production releases since September 2024</dd></div>
-  <div><dt>1</dt><dd>revert in all 67, and it was not AI-written code</dd></div>
-  <div><dt>8</dt><dd>engineers who commit with the AI workflow</dd></div>
-</dl>
-<p class="stack"><b>Stack</b> Next.js 16, React 19, TypeScript, TanStack Query, Zustand, Claude Code plugins and skills, MCP, CI eval gates</p>
+<p class="stack"><b>AI tooling</b> Claude Code, context engineering, hooks, subagents, plugins, MCP (Jira, Context7), evals, spec-driven development</p>
+<p class="stack" style="margin-top:6px"><b>Frontend</b> Next.js 16, React 19, TypeScript, TanStack Query, Zustand</p>
 
 <h2>The problem</h2>
 <p>AI coding agents write code fast. They do not know the business rules of a marketplace: which listing fields a dealer must fill, which prices the page can show, which SEO rules apply. A fast agent with no rules gives fast code that breaks a rule in a quiet way. A reviewer then finds the problem late, or a user finds it in production.</p>
 <p>So the question for the team was not "Which model do we use?" It was "What must the agent know before it starts, and what must it pass before it merges?"</p>
+
+<h2>Context engineering</h2>
+<p>An agent can only follow the rules that are in its context. If the context holds too much, the agent misses the rules that matter. So each task must load the correct context, and only that context.</p>
+<ul class="plain">
+  <li><strong>CLAUDE.md files</strong> hold the project rules. Conditional blocks apply only when the task matches them.</li>
+  <li><strong>Path-scoped rules</strong> load only when the agent changes a file under that path.</li>
+  <li><strong>ADRs and a glossary</strong> give the agent each past decision and the team's domain words.</li>
+  <li><strong>Progressive disclosure:</strong> I split a 29 KB coding standard into a hub and 8 topic files. Each skill is a short entry file that points to its topic files. A CI check fails any skill entry file that is over the word limit.</li>
+</ul>
+
+<h2>Guardrails</h2>
+<p>An instruction in CLAUDE.md is a request. A hook is a rule, because Claude Code runs it each time. I put the rules that must never break into hooks:</p>
+<dl class="hooks">
+  <div><dt>Before a command <code>PreToolUse</code></dt><dd>Block dangerous commands, and protect key files from edits.</dd></div>
+  <div><dt>After an edit <code>PostToolUse</code></dt><dd>Format and lint the changed file.</dd></div>
+  <div><dt>Before the agent stops <code>Stop</code></dt><dd>Run the typecheck, so the agent fixes its type errors first.</dd></div>
+  <div><dt>Before a PR</dt><dd>Block the PR until the tests pass.</dd></div>
+  <div><dt>Session start, each prompt <code>SessionStart</code> <code>UserPromptSubmit</code></dt><dd>Load the business rules of the product into the agent's context.</dd></div>
+</dl>
+<p>2 subagents split the work: an engineer writes the code, and a reviewer checks it with a clean context.</p>
 
 <h2>The workflow</h2>
 <p>Each feature goes through the same 8 steps. Steps 1 to 6 are commands from an open-source skills workflow. My plugins add the business-rule check at the start, and the staging merge for QA at the end. The agent does the slow, repeated work. A person owns each decision.</p>
@@ -296,35 +305,31 @@ gh issue create --label domain-gap --assignee @me \
   --title "&lt;repo&gt;: no skill for &lt;area&gt;" --body "&lt;the request&gt;"</code></pre>
 <p>The result: the rules grow from real feature work, not from a separate project. Each gap has an owner from the first day, and no rule lives only in 1 person's head.</p>
 
-<h2>The tools behind it</h2>
-<p>I designed a Claude Code plugin marketplace for the frontend teams: <strong>7 plugins with 18 skills, in 5 product repos</strong>. A shared plugin holds the team standards. Domain plugins hold the business rules of each product. The plugins extend an open-source skills workflow.</p>
+<h2>The plugin marketplace</h2>
+<p>I designed and led a Claude Code plugin marketplace for <strong>5 product repos</strong>. A shared plugin holds the team standards and the workflow. A domain plugin for each product holds its business rules. Hooks load those rules into the agent's context, and open a GitHub issue when a rule is missing.</p>
 <h3>A plugin ships only if it makes the output better</h3>
 <p>Each plugin release goes through 3 gates:</p>
 <ul class="plain">
-  <li>A CI check on each pull request.</li>
+  <li>CI checks on each pull request.</li>
   <li>A version and a change log through Changesets, so each team knows what changed.</li>
-  <li>An eval suite that runs the same tasks with and without the plugin. If the result with the plugin is not better, the plugin does not ship.</li>
+  <li>An eval suite that runs the same tasks with and without each skill. If the result with the skill is not better, the skill does not ship.</li>
 </ul>
-
-<h2>The 1 revert</h2>
-<div class="revert-box">
-  <p><strong>Release r54, 7 October 2026.</strong> I upgraded all packages in 1 pull request to close 96 Dependabot alerts. I wrote that change by hand, outside the AI workflow. We undid it the next day, in release r55.</p>
-  <p>The lesson: a large change that skips the small steps is a risk, if a person or an agent writes it.</p>
-</div>
 
 <h2>What I learned</h2>
 <h3>A better model does not fix a bad spec</h3>
 <p>Most bad AI output came from a vague input. The largest gain came from the business-rule check before the spec, not from a newer model.</p>
-<h3>Measure the result, not the volume</h3>
-<p>The number of lines that AI writes says nothing about quality. The revert rate and the release pace do. These are the numbers that I track.</p>
+<h3>Put a rule in a hook, not in a prompt</h3>
+<p>The agent can forget an instruction. It cannot skip a hook. A rule that must never break belongs in a hook or a CI check.</p>
+<h3>Less context is better context</h3>
+<p>A long instruction file makes the agent miss the rules that matter. Short entry files, path-scoped rules, and a word limit in CI keep the context small.</p>
 <h3>The engineer's job changes</h3>
 <p>Engineers write less code by hand. They own more of the requirements, the gates, and the final approval.</p>
 
 <h2>What this page does not claim</h2>
 <ul class="plain">
-  <li>AI did not write all 67 releases. The workflow started with release r34. Releases r1 to r33 came before it.</li>
-  <li>The release pace depends on the team and the roadmap too. The workflow is 1 cause, not the only cause.</li>
-  <li>The eval suite compares results with and without each plugin. I did not keep the raw runs of the first evals, so this page does not give a score.</li>
+  <li>The work repos are private, so this page describes the method, not the code.</li>
+  <li>Steps 1 to 6 of the workflow come from an open-source skills workflow. My work is the business-rule check, the hooks, the plugins, and the staging merge.</li>
+  <li>The eval suite compares results with and without each skill. I did not keep the raw runs of the first evals, so this page does not give a score.</li>
 </ul>
 
 <footer class="contact">
@@ -338,45 +343,5 @@ gh issue create --label domain-gap --assignee @me \
 
 </main>
 
-<script>
-(function () {
-  // Production release dates (git tags prod/r1 to prod/r67).
-  var dates = "2024-09-25 2024-09-27 2025-01-20 2025-03-14 2025-04-17 2025-04-17 2025-04-28 2025-04-30 2025-06-16 2025-06-19 2025-06-19 2025-06-20 2025-07-16 2025-07-28 2025-10-13 2025-12-10 2025-12-16 2026-02-05 2026-02-11 2026-03-03 2026-03-11 2026-03-13 2026-03-18 2026-04-02 2026-04-07 2026-04-07 2026-04-22 2026-05-06 2026-05-18 2026-06-18 2026-06-25 2026-06-26 2026-07-02 2026-07-14 2026-07-20 2026-07-21 2026-07-23 2026-07-23 2026-07-28 2026-07-30 2026-08-06 2026-08-06 2026-08-13 2026-08-13 2026-08-26 2026-08-26 2026-08-27 2026-09-01 2026-09-07 2026-09-14 2026-09-22 2026-10-05 2026-10-05 2026-10-07 2026-10-08 2026-10-12 2026-10-19 2026-10-21 2026-10-22 2026-10-25 2026-10-27 2026-10-28 2026-10-30 2026-11-02 2026-11-04 2026-11-04 2026-11-05".split(" ");
-  var AI_START = 34, REVERTED = 54;
-  var NS = "http://www.w3.org/2000/svg";
-  var svg = document.getElementById("tl"), axis = document.getElementById("tl-axis");
-  var t0 = Date.parse("2024-09-01"), t1 = Date.parse("2026-11-30");
-  function pct(d) { return (Date.parse(d) - t0) / (t1 - t0); }
-  function el(name, attrs) {
-    var n = document.createElementNS(NS, name);
-    for (var k in attrs) n.setAttribute(k, attrs[k]);
-    svg.appendChild(n); return n;
-  }
-  var eraX = pct("2026-07-10") * 1000;
-  el("rect", { "class": "era", x: eraX, y: 0, width: 1000 - eraX, height: 88 });
-  el("line", { "class": "axis", x1: 0, y1: 87.5, x2: 1000, y2: 87.5, "vector-effect": "non-scaling-stroke" });
-  var seen = {};
-  dates.forEach(function (d, i) {
-    var n = i + 1, off = (seen[d] = (seen[d] || 0) + 1) - 1;
-    var cls = n === REVERTED ? "tick tick-revert" : n >= AI_START ? "tick tick-ai" : "tick tick-pre";
-    var xx = pct(d) * 1000 + off * 4;
-    var line = el("line", { "class": cls, x1: xx, x2: xx, y1: 88, y2: n === REVERTED ? 4 : 22, "vector-effect": "non-scaling-stroke" });
-    line.style.animationDelay = (i * 10) + "ms";
-    var tip = document.createElementNS(NS, "title");
-    tip.textContent = "Release r" + n + ", " + d + (n === REVERTED ? " (reverted in r55)" : "");
-    line.appendChild(tip);
-  });
-  function label(text, p, cls) {
-    var s = document.createElement("span");
-    s.textContent = text; s.style.left = (p * 100) + "%";
-    if (cls) s.className = cls; axis.appendChild(s);
-  }
-  label("Sep 2024", 0, "first");
-  label("2025", pct("2025-01-01"), "y25");
-  label("2026", pct("2026-01-01"));
-  label("Nov 2026", 1, "last");
-  label("r54 reverted", pct(dates[REVERTED - 1]), "rv");
-})();
-</script>
 </body>
 </html>
